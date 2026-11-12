@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手沖咖啡風味科學：從種子到杯中的風味密碼</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* 明亮日系/北歐精品咖啡明亮色調 */
+      --bg-main: #FAF8F5;
+      --bg-subtle: #F2ECE4;
+      --bg-card: #FFFFFF;
+      --bg-card-hover: #FFFFFF;
+      
+      --accent-espresso: #2B1810;
+      --accent-roast: #4A2E1B;
+      --accent-caramel: #9B5327;
+      --accent-amber: #C67D3E;
+      --accent-terracotta: #C94E38;
+      --accent-sage: #44775E;
+      
+      --text-title: #22150E;
+      --text-main: #3D2D24;
+      --text-muted: #726258;
+      --text-light: #99887E;
+      
+      --border-subtle: rgba(155, 83, 39, 0.15);
+      --border-strong: rgba(155, 83, 39, 0.38);
+      --shadow-card: 0 6px 20px rgba(74, 46, 27, 0.06), 0 2px 6px rgba(74, 46, 27, 0.04);
+      --shadow-hover: 0 12px 32px rgba(74, 46, 27, 0.12), 0 4px 10px rgba(74, 46, 27, 0.05);
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Deck Container */
+    #deck {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Individual Slide */
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 3.2rem 5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.98) translateY(10px);
+      transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1), transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+      background-color: var(--bg-main);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1) translateY(0);
+      z-index: 10;
+    }
+
+    /* Top Progress Bar */
+    #progress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: rgba(155, 83, 39, 0.08);
+      z-index: 100;
+    }
+
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-amber), var(--accent-terracotta), var(--accent-caramel));
+      transition: width 0.35s ease;
+    }
+
+    /* Header & Badges */
+    .slide-header {
+      margin-bottom: 1.8rem;
+    }
+
+    .slide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent-caramel);
+      background: rgba(155, 83, 39, 0.08);
+      border: 1px solid var(--border-subtle);
+      border-radius: 30px;
+      margin-bottom: 0.6rem;
+    }
+
+    .slide-title {
+      font-size: 2.55rem;
+      font-weight: 900;
+      line-height: 1.25;
+      color: var(--text-title);
+      letter-spacing: -0.5px;
+    }
+
+    .slide-title span.highlight {
+      background: linear-gradient(120deg, var(--accent-terracotta), var(--accent-amber));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-subtitle {
+      font-size: 1.12rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      font-weight: 500;
+    }
+
+    /* Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.6rem;
+      width: 100%;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+      width: 100%;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+      width: 100%;
+    }
+
+    .grid-hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 2.2rem;
+      align-items: center;
+    }
+
+    /* Card Component */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.6rem;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.28s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    /* Vector SVG Icons (Self-Contained, No External File Dependencies) */
+    .svg-icon {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 0.8rem;
+      color: var(--accent-caramel);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .svg-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .card h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent-espresso);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card p {
+      font-size: 0.96rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Color Pills for Flavor Profiles */
+    .highlight-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.3px;
+    }
+    .pill-acid { 
+      background: rgba(201, 78, 56, 0.1); 
+      color: #B53620; 
+      border: 1px solid rgba(201, 78, 56, 0.25); 
+    }
+    .pill-sweet { 
+      background: rgba(198, 125, 62, 0.12); 
+      color: #9E591B; 
+      border: 1px solid rgba(198, 125, 62, 0.28); 
+    }
+    .pill-body { 
+      background: rgba(68, 119, 94, 0.12); 
+      color: #2F634A; 
+      border: 1px solid rgba(68, 119, 94, 0.28); 
+    }
+
+    /* Bullet Lists */
+    .bullet-list {
+      list-style: none;
+      margin-top: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .bullet-list li {
+      display: block;
+      position: relative;
+      padding-left: 1.25rem;
+      font-size: 0.94rem;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .bullet-list li::before {
+      content: "✦";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--accent-amber);
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .bullet-list li b {
+      color: var(--accent-espresso);
+      font-weight: 700;
+    }
+
+    .bullet-tag {
+      display: inline-block;
+      vertical-align: baseline;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      white-space: nowrap;
+      background: var(--bg-subtle);
+      color: var(--accent-espresso);
+      border: 1px solid var(--border-subtle);
+      margin-right: 6px;
+    }
+
+    .bullet-tag-gold {
+      display: inline-block;
+      vertical-align: baseline;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      white-space: nowrap;
+      background: rgba(198, 125, 62, 0.15);
+      color: var(--accent-caramel);
+      border: 1px solid rgba(198, 125, 62, 0.3);
+      margin-right: 6px;
+    }
+
+    /* Highlight Stat Box */
+    .stat-box {
+      background: var(--bg-subtle);
+      border-left: 4px solid var(--accent-caramel);
+      padding: 0.75rem 1rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-top: auto;
+    }
+
+    .stat-number {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--accent-espresso);
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* Timeline Component */
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-top: 1.2rem;
+      gap: 1rem;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 24px;
+      left: 5%;
+      width: 90%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-amber), var(--accent-terracotta), var(--accent-caramel));
+      z-index: 1;
+    }
+
+    .timeline-node {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      text-align: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.3rem 1rem;
+      box-shadow: var(--shadow-card);
+      transition: all 0.28s ease;
+    }
+
+    .timeline-node:hover {
+      border-color: var(--accent-caramel);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .node-dot {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 3px solid var(--accent-caramel);
+      margin: 0 auto 0.8rem auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: var(--accent-espresso);
+      font-size: 1.05rem;
+      box-shadow: 0 4px 12px rgba(155, 83, 39, 0.15);
+    }
+
+    .node-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent-espresso);
+      margin-bottom: 0.3rem;
+    }
+
+    .node-desc {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Decision Tree / Box */
+    .tree-box {
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1.3rem;
+      box-shadow: var(--shadow-card);
+      transition: all 0.25s ease;
+    }
+
+    .tree-box:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .tree-tag {
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    /* Bottom Navigation Bar */
+    #bottom-bar {
+      height: 60px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(155, 83, 39, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      z-index: 50;
+      box-shadow: 0 -4px 16px rgba(74, 46, 27, 0.03);
+    }
+
+    .deck-info {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .deck-info span.counter {
+      color: var(--accent-caramel);
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-nav {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-espresso);
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav:hover {
+      background: var(--accent-espresso);
+      color: #FFFFFF;
+      border-color: var(--accent-espresso);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(43, 24, 16, 0.15);
+    }
+
+    /* Thumbnail Overview Drawer */
+    #overview-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(250, 248, 245, 0.96);
+      backdrop-filter: blur(16px);
+      z-index: 200;
+      display: none;
+      padding: 3rem 4rem;
+      overflow-y: auto;
+    }
+
+    #overview-modal.open {
+      display: block;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1.3rem;
+      max-width: 1250px;
+      margin: 2rem auto 0 auto;
+    }
+
+    .thumb-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-card);
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .thumb-card:hover, .thumb-card.active {
+      border-color: var(--accent-caramel);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .thumb-num {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--accent-caramel);
+    }
+
+    .thumb-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-title);
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Progress Bar -->
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+
+  <!-- Deck Slide Container -->
+  <main id="deck">
+
+    <!-- ==========================================
+         SLIDE 1: 封面 COVER (純 CSS 與 SVG 裝飾，永不破圖)
+         ========================================== -->
+    <section class="slide active" style="background: radial-gradient(circle at 80% 20%, rgba(198, 125, 62, 0.12) 0%, transparent 50%), radial-gradient(circle at 10% 80%, rgba(201, 78, 56, 0.08) 0%, transparent 45%), var(--bg-main);">
+      <div style="max-width: 860px; margin: auto; text-align: center;">
+        <div class="slide-badge" style="margin-bottom: 1.2rem; background: rgba(255, 255, 255, 0.9); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+          <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          手沖咖啡風味科學專題
+        </div>
+        <h1 style="font-size: 3.8rem; font-weight: 900; line-height: 1.18; color: var(--text-title); margin-bottom: 1.2rem; letter-spacing: -1px;">
+          從生豆到杯中的<br><span class="highlight">風味密碼</span>
+        </h1>
+        <p style="font-size: 1.35rem; color: var(--text-muted); line-height: 1.6; max-width: 660px; margin: 0 auto 2.5rem auto;">
+          70% 實戰風味對照 ＋ 30% 流體與化學機制<br>
+          系統化掌握處理法、烘焙熱裂解、金杯萃取與四大關鍵要素
+        </p>
+        <div style="display: flex; justify-content: center; gap: 1.4rem;">
+          <button class="btn-nav" onclick="nextSlide()" style="padding: 12px 30px; font-size: 1.05rem; background: var(--accent-espresso); color: #FFF; border-color: var(--accent-espresso);">
+            開始探索 ➜
+          </button>
+          <button class="btn-nav" onclick="toggleOverview()" style="padding: 12px 24px; font-size: 1.05rem;">
+            章節總覽
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 2: 課程全景地圖 ROADMAP (SVG 內嵌圖示)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">全景地圖 CURRICULUM ROADMAP</div>
+        <h2 class="slide-title">一杯完美手沖的 <span class="highlight">五部因果鏈條</span></h2>
+        <p class="slide-subtitle">好喝不是玄學，是五個物理與化學階段的精準接力</p>
+      </div>
+      <div class="grid-4" style="grid-template-columns: repeat(5, 1fr);">
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 1.7rem; font-weight: 900; color: var(--accent-caramel); margin-bottom: 0.3rem;">01</div>
+          <div class="svg-icon" style="margin: 0 auto 0.6rem auto;">
+            <svg viewBox="0 0 24 24"><path d="M12 2L4 7v10l8 5 8-5V7l-8-5z"/><path d="M12 22V12"/><path d="M20 7l-8 5-8-5"/></svg>
+          </div>
+          <h3>處理法</h3>
+          <p>決定生豆的<b>前驅物與本質底色</b>（酸感 vs 醇厚度）</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 1.7rem; font-weight: 900; color: var(--accent-caramel); margin-bottom: 0.3rem;">02</div>
+          <div class="svg-icon" style="margin: 0 auto 0.6rem auto;">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12c2-4 6-4 8 0s-6 4-8 0"/></svg>
+          </div>
+          <h3>烘焙度</h3>
+          <p>透過<b>梅納與焦糖化</b>，將生豆轉化為香氣與多孔細胞</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 1.7rem; font-weight: 900; color: var(--accent-caramel); margin-bottom: 0.3rem;">03</div>
+          <div class="svg-icon" style="margin: 0 auto 0.6rem auto;">
+            <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          </div>
+          <h3>金杯萃取</h3>
+          <p>掌握<b>TDS 與 EY%</b>，解密物質溶解的先後賽跑</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 1.7rem; font-weight: 900; color: var(--accent-caramel); margin-bottom: 0.3rem;">04</div>
+          <div class="svg-icon" style="margin: 0 auto 0.6rem auto;">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><polyline points="12 9 12 12 13.5 13.5"/><path d="M16.51 17.35l-.85 1.41a9 9 0 1 1 2.34-2.34l-1.49-.93"/></svg>
+          </div>
+          <h3>關鍵要素</h3>
+          <p>吧台上的<b>水溫、磨粉、時間、焙度</b>四大萃取變因</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 1.7rem; font-weight: 900; color: var(--accent-caramel); margin-bottom: 0.3rem;">05</div>
+          <div class="svg-icon" style="margin: 0 auto 0.6rem auto;">
+            <svg viewBox="0 0 24 24"><path d="M6 3h12l-3 10H9L6 3z"/><path d="M9 13v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-6"/></svg>
+          </div>
+          <h3>濾杯幾何</h3>
+          <p>引導水流路徑與保溫的<b>水道工程載體</b></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 3: 處理法三大光譜 (修正日曬熱裂解誤用、水溫標示)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 01 · 豆性源頭</div>
+        <h2 class="slide-title">三大經典處理法：<span class="highlight">風味性格對照</span></h2>
+        <p class="slide-subtitle">去除果皮與果膠的時機，決定了杯中的酸度與醇厚度</p>
+      </div>
+      <div class="grid-3">
+        <!-- 水洗 -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <h3>水洗處理 Washed</h3>
+            <span class="highlight-pill pill-acid">極致純淨</span>
+          </div>
+          <p style="margin-top: 0.4rem;"><b>脫皮去膠後乾燥</b>。不依賴外源發酵，完全展現產區風土與品種純粹風味。</p>
+          <ul class="bullet-list">
+            <li><b>風味關鍵詞</b>：茉莉花香、檸檬柑橘、蘋果酸、紅茶韻</li>
+            <li><b>酸感表現</b>：銳利活潑、立體明亮</li>
+            <li><b>醇厚口感</b>：清爽輕盈 (Tea-like Body)</li>
+          </ul>
+          <div class="stat-box" style="margin-top: 1.2rem;">
+            <div class="stat-number">凸顯花果酸質</div>
+            <div class="stat-label">萃取傾向 · 適合高水溫與快流速濾杯</div>
+          </div>
+        </div>
+        <!-- 蜜處理 -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <h3>蜜處理 Honey</h3>
+            <span class="highlight-pill pill-sweet">酸甜平衡</span>
+          </div>
+          <p style="margin-top: 0.4rem;"><b>去皮保留部分果膠乾燥</b>。黃蜜、紅蜜、黑蜜依果膠厚度精準調控發酵糖度。</p>
+          <ul class="bullet-list">
+            <li><b>風味關鍵詞</b>：杏桃、蜂蜜、核果、紅糖、柔和甜橙</li>
+            <li><b>酸感表現</b>：溫和柔順、甜感包裹</li>
+            <li><b>醇厚口感</b>：糖漿般圓潤 (Syrupy Body)</li>
+          </ul>
+          <div class="stat-box" style="margin-top: 1.2rem;">
+            <div class="stat-number">平衡酸甜滋味</div>
+            <div class="stat-label">萃取傾向 · 保留果膠糖分與滑順口感</div>
+          </div>
+        </div>
+        <!-- 日曬 -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <h3>日曬處理 Natural</h3>
+            <span class="highlight-pill pill-body">濃醇酒香</span>
+          </div>
+          <p style="margin-top: 0.4rem;"><b>整顆全果帶肉乾燥</b>。果肉糖分在酵母菌與細菌作用下進行<b>微生物發酵轉化</b>，生成豐富酯類化合物。</p>
+          <ul class="bullet-list">
+            <li><b>風味關鍵詞</b>：藍莓果醬、熱帶水果、發酵酒香、黑櫻桃</li>
+            <li><b>酸感表現</b>：成熟果甜酸、刺激感低</li>
+            <li><b>醇厚口感</b>：濃郁黏稠 (Heavy Body)</li>
+          </ul>
+          <div class="stat-box" style="margin-top: 1.2rem;">
+            <div class="stat-number">萃出奔放果香</div>
+            <div class="stat-label">萃取傾向 · 控溫避免過萃帶出發酵雜澀</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 4: 現代實驗處理法
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 01 · 科技創新</div>
+        <h2 class="slide-title">印尼濕刨與 <span class="highlight">現代實驗處理法</span></h2>
+        <p class="slide-subtitle">人為精準控制微生物環境，雕刻出傳統自然乾燥無法產生的特殊香氣</p>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <h3>印尼濕刨法 Giling Basah</h3>
+            <span class="highlight-pill pill-body">草本厚實</span>
+          </div>
+          <p style="margin-top: 0.4rem;"><b>30%~40% 高含水率提前刨除羊皮紙</b>。生豆裸露氧化，酸質大量釋出流失。</p>
+          <ul class="bullet-list">
+            <li><b>風味特性</b>：雪松木、菸草、草本、黑巧克力</li>
+            <li><b>感官指標</b>：極低酸度 ＋ 極度厚重 Body</li>
+            <li><b>代表產區</b>：蘇門答臘曼特寧</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <h3>厭氧發酵 Anaerobic</h3>
+            <span class="highlight-pill pill-sweet">香氣爆棚</span>
+          </div>
+          <p style="margin-top: 0.4rem;"><b>密封無氧不鏽鋼桶</b>。壓制好氧醋酸菌，促進乳酸菌代謝，生成特異性芳香化合物。</p>
+          <ul class="bullet-list">
+            <li><b>風味特性</b>：肉桂、熱帶水果軟糖、酒釀黑櫻桃</li>
+            <li><b>感官指標</b>：絲絨乳酸觸感 ＋ 香氣爆棚</li>
+            <li><b>沖煮建議</b>：研磨略粗，保留精緻前段香</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <h3>熱休克 Thermal Shock</h3>
+            <span class="highlight-pill pill-acid">賽事新寵</span>
+          </div>
+          <p style="margin-top: 0.4rem;"><b>發酵特定節點施加冷熱溫差衝擊</b>，迫使果實內部細胞結構鎖住芳香化合物。</p>
+          <ul class="bullet-list">
+            <li><b>風味特性</b>：清晰度極高、如精油般的玫瑰或蜜桃香</li>
+            <li><b>感官指標</b>：超高辨識度的單一香氣聚攏</li>
+            <li><b>代表風味</b>：如精品荔枝、白桃烏龍</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 5: 烘焙四階段 (嚴格依據盧貝斯 Rubasse 官方溫度數據)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 02 · 火的轉化 (盧貝斯烘焙指南)</div>
+        <h2 class="slide-title">咖啡烘焙四階段：<span class="highlight">溫度與化學轉化</span></h2>
+        <p class="slide-subtitle">熱能將生豆內部的糖分、胺基酸與綠原酸轉化為數百種香氣分子</p>
+      </div>
+      <div class="timeline">
+        <div class="timeline-node">
+          <div class="node-dot">1</div>
+          <div class="node-title">脫水期</div>
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent-caramel); margin-bottom: 0.4rem;">室溫 → 150°C</div>
+          <div class="node-desc">豆內水分蒸發<br>青綠轉為淡黃<br>散發烘烤青草氣息</div>
+        </div>
+        <div class="timeline-node">
+          <div class="node-dot">2</div>
+          <div class="node-title">梅納反應期</div>
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent-caramel); margin-bottom: 0.4rem;">150°C ～ 200°C</div>
+          <div class="node-desc">糖與胺基酸結合裂解<br>生成<b>焦糖甜、堅果烤焙香</b><br>轉化複合果酸</div>
+        </div>
+        <div class="timeline-node" style="border-color: var(--accent-caramel);">
+          <div class="node-dot" style="background: var(--accent-caramel); color: #FFF;">3</div>
+          <div class="node-title" style="color: var(--accent-caramel);">一爆開始</div>
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent-caramel); margin-bottom: 0.4rem;">200°C 開始爆裂</div>
+          <div class="node-desc">蒸氣與 CO2 釋放清脆爆裂聲<br>細胞壁結構撐開<br><b>淺焙約 210°C 出豆</b></div>
+        </div>
+        <div class="timeline-node">
+          <div class="node-dot">4</div>
+          <div class="node-title">風味發展期</div>
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent-caramel); margin-bottom: 0.4rem;">一爆後持續加溫</div>
+          <div class="node-desc">酸感降、甜感轉化、厚度增加<br><b>中焙 218～220°C 出豆</b><br><b>深焙二爆 228～230°C 出豆</b></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top: 1.5rem; padding: 1.1rem; flex-direction: row; align-items: center; justify-content: space-around; text-align: center; background: var(--bg-subtle);">
+        <div><b>淺焙 (~210°C)</b>：明亮花果酸香 · 適合手沖與冷萃</div>
+        <div style="color: var(--accent-amber); font-weight: 800;">➜</div>
+        <div><b>中焙 (218~220°C)</b>：酸甜苦均衡堅果巧克力 · 手沖/虹吸/美式</div>
+        <div style="color: var(--accent-amber); font-weight: 800;">➜</div>
+        <div><b>深焙 (228~230°C)</b>：苦甜濃郁、可可煙燻 · 義式濃縮與拿鐵首選</div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 6: 烘焙度與沖煮參數對應 (移除未引證低溫，依來源校正)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 02 · 實戰對位</div>
+        <h2 class="slide-title">焙度 × 沖煮參數：<span class="highlight">避免踩坑的物理法則</span></h2>
+        <p class="slide-subtitle">烘焙度改變了咖啡豆內部的「孔隙率」與「溶解阻力」</p>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between;">
+            <h3>淺焙 Light Roast</h3>
+            <span class="highlight-pill pill-acid">防欠萃尖酸</span>
+          </div>
+          <p style="margin: 0.4rem 0;">細胞壁緻密堅硬，水滲透阻力大。</p>
+          <div style="background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 0.8rem; margin: 0.6rem 0;">
+            <div style="color: var(--accent-espresso); font-weight: 800;">水溫：90°C ~ 94°C (充足熱能)</div>
+            <div style="color: var(--text-muted); font-size: 0.88rem;">研磨：中細研磨 (增加接觸面積)</div>
+            <div style="color: var(--text-muted); font-size: 0.88rem;">器具：手沖 (錐形/平底)、冷萃冰釀</div>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--accent-caramel);"><b>重點口訣</b>：淺焙緻密需充足水溫，釋放清爽花果酸香！</p>
+        </div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between;">
+            <h3>中焙 Medium Roast</h3>
+            <span class="highlight-pill pill-sweet">百搭甜平衡</span>
+          </div>
+          <p style="margin: 0.4rem 0;">結構適度鬆脆，水滲透速度最均衡。</p>
+          <div style="background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 0.8rem; margin: 0.6rem 0;">
+            <div style="color: var(--accent-espresso); font-weight: 800;">水溫：88°C ~ 92°C (標準水溫)</div>
+            <div style="color: var(--text-muted); font-size: 0.88rem;">研磨：中度研磨 (二號砂糖粗細)</div>
+            <div style="color: var(--text-muted); font-size: 0.88rem;">器具：手沖、虹吸壺、美式咖啡機</div>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--accent-caramel);"><b>重點口訣</b>：容錯率最高，隨便沖都具備堅果焦糖甜感。</p>
+        </div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between;">
+            <h3>深焙 Dark Roast</h3>
+            <span class="highlight-pill pill-body">防過萃焦苦</span>
+          </div>
+          <p style="margin: 0.4rem 0;">組織多孔酥脆，苦味與重分子溶出速度極快。</p>
+          <div style="background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 0.8rem; margin: 0.6rem 0;">
+            <div style="color: var(--accent-espresso); font-weight: 800;">水溫：適度控溫避免高溫逼出重苦</div>
+            <div style="color: var(--text-muted); font-size: 0.88rem;">研磨：中粗研磨 (海鹽顆粒)</div>
+            <div style="color: var(--text-muted); font-size: 0.88rem;">器具：義式濃縮、拿鐵、摩卡壺</div>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--accent-caramel);"><b>重點口訣</b>：避免長時間高溫浸泡，保留可可醇厚苦甘！</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 7: 金杯理論雙維度 (嚴格校正 TDS 上限為 1.35%)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 03 · 科學標準 (Matrix / Fuki 來源)</div>
+        <h2 class="slide-title">SCA 金杯準則：<span class="highlight">濃度 vs 萃取率</span></h2>
+        <p class="slide-subtitle">不要把「濃度（濃淡）」與「萃取率（風味平衡）」混為一談！</p>
+      </div>
+      <div class="grid-2">
+        <div class="card" style="justify-content: center; padding: 2.2rem;">
+          <span class="highlight-pill pill-sweet" style="width: fit-content;">指標一：濃度 (Strength)</span>
+          <div style="font-size: 3.2rem; font-weight: 900; color: var(--accent-espresso); margin: 0.6rem 0;">
+            1.15% ~ 1.35%
+          </div>
+          <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-title); margin-bottom: 0.4rem;">
+            TDS (Total Dissolved Solids 總溶解固形物)
+          </div>
+          <p style="font-size: 1rem; color: var(--text-muted); line-height: 1.6;">
+            衡量整杯咖啡液中，溶解固形物佔總液重的百分比。<br>
+            • <b>高於 1.35%</b>：口感濃烈厚重、舌根刺激黏膩<br>
+            • <b>低於 1.15%</b>：口感單薄如水、香氣空泛無力
+          </p>
+        </div>
+        <div class="card" style="justify-content: center; padding: 2.2rem;">
+          <span class="highlight-pill pill-acid" style="width: fit-content;">指標二：萃取率 (Extraction)</span>
+          <div style="font-size: 3.2rem; font-weight: 900; color: var(--accent-terracotta); margin: 0.6rem 0;">
+            18% ~ 22%
+          </div>
+          <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-title); margin-bottom: 0.4rem;">
+            EY (Extraction Yield 萃取率)
+          </div>
+          <p style="font-size: 1rem; color: var(--text-muted); line-height: 1.6;">
+            衡量咖啡粉被水溶解出來的物質佔粉重的百分比。<br>
+            • <b>低於 18% (萃取不足)</b>：酸味尖銳、甜感不足、口感單薄<br>
+            • <b>高於 22% (過度萃取)</b>：苦味突顯、乾澀刮舌、缺乏明亮感
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 8: 溶解動力學時間賽跑 (修正類黑素、咖啡因前段溶出)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 03 · 萃取動力學</div>
+        <h2 class="slide-title">物質溶出順序：<span class="highlight">先酸香、後甜感、再雜苦</span></h2>
+        <p class="slide-subtitle">好喝的咖啡不是把所有物質榨乾，而是在正確的時間點收手！</p>
+      </div>
+      <div class="grid-3">
+        <div class="card" style="border-top: 5px solid var(--accent-terracotta);">
+          <div style="font-size: 0.88rem; font-weight: 800; color: var(--accent-terracotta); margin-bottom: 0.4rem;">
+            前段 (0 ~ 45秒)
+          </div>
+          <h3>高溶解度物質</h3>
+          <p>極性高、分子小或高水溶性，接觸熱水即快速溶出。</p>
+          <ul class="bullet-list" style="margin-top: 1rem;">
+            <li><b>溶出成分</b>：檸檬酸、蘋果酸、<b>咖啡因 (極易溶)</b>、高揮發性花果芳香分子</li>
+            <li><b>杯中風味</b>：明亮活潑果酸、清爽花香氣息</li>
+            <li><b>若停在此處</b>：尖酸草本、水感單薄 (嚴重欠萃)</li>
+          </ul>
+        </div>
+        <div class="card" style="border-top: 5px solid var(--accent-amber);">
+          <div style="font-size: 0.88rem; font-weight: 800; color: var(--accent-amber); margin-bottom: 0.4rem;">
+            中段 (45 ~ 100秒)
+          </div>
+          <h3>中溶解度物質</h3>
+          <p>需持續熱水浸潤擴散，是好喝與圓潤的靈魂！</p>
+          <ul class="bullet-list" style="margin-top: 1rem;">
+            <li><b>溶出成分</b>：可溶性糖類、焦糖化產物、<b>類黑素 (Melanoidins)</b></li>
+            <li><b>杯中風味</b>：焦糖堅果甜感、滑順圓潤 Body、酸甜完美包裹</li>
+            <li><b>黃金目標</b>：讓中段物質充分享受水流萃取</li>
+          </ul>
+        </div>
+        <div class="card" style="border-top: 5px solid #8E827A;">
+          <div style="font-size: 0.88rem; font-weight: 800; color: #8E827A; margin-bottom: 0.4rem;">
+            後段 (100秒以上)
+          </div>
+          <h3>低溶解度物質</h3>
+          <p>分子量巨大、難溶性多酚與木質素裂解產物。</p>
+          <ul class="bullet-list" style="margin-top: 1rem;">
+            <li><b>溶出成分</b>：奎寧酸、單寧多酚類、焦苦重分子</li>
+            <li><b>杯中風味</b>：刮舌澀感、焦苦後韻、喉頭收斂乾燥</li>
+            <li><b>若萃取過度</b>：口腔水分被吸乾的澀苦感 (過萃災難)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 9: 通道效應 (簡化術語，直擊水流裂縫本質)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 03 · 新手噩夢</div>
+        <h2 class="slide-title">新手大敵：<span class="highlight">通道效應 (Channeling)</span></h2>
+        <p class="slide-subtitle">為什麼同一杯咖啡會「入口尖銳刺酸，入喉立刻焦苦發澀」？</p>
+      </div>
+      <div class="grid-2">
+        <div class="card" style="justify-content: center;">
+          <h3>水流物理：永遠走阻力最小的裂縫</h3>
+          <p style="margin-top: 0.6rem; font-size: 1.05rem; line-height: 1.6;">
+            當粉床密實度不均或水流衝擊過大時，水會沖刷出阻力最小的裂隙通道：
+          </p>
+          <div style="background: rgba(201, 78, 56, 0.08); border-left: 4px solid var(--accent-terracotta); border-radius: var(--radius-sm); padding: 0.9rem 1.1rem; margin-top: 1rem;">
+            <b style="color: var(--accent-terracotta);">裂縫通道內部</b>：超大量熱水集中沖刷，咖啡粉<b>嚴重過度萃取</b>，溶出焦苦澀感！
+          </div>
+          <div style="background: rgba(198, 125, 62, 0.08); border-left: 4px solid var(--accent-amber); border-radius: var(--radius-sm); padding: 0.9rem 1.1rem; margin-top: 0.8rem;">
+            <b style="color: var(--accent-amber);">通道之外大部分粉床</b>：熱水未充分接觸浸潤，<b>嚴重萃取不足</b>，留下尖銳死酸！
+          </div>
+        </div>
+        <div class="card" style="background: var(--bg-subtle); border: 1px dashed var(--accent-caramel); justify-content: center;">
+          <h3 style="color: var(--accent-espresso); margin-bottom: 1rem;">預防通道效應的三大原則</h3>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span style="background: var(--accent-caramel); color: #FFF; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800;">1</span>
+              <div><b>注水溫和穩定</b>，水柱貼近粉層輕柔畫圈，避免重水柱砸穿粉床</div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span style="background: var(--accent-caramel); color: #FFF; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800;">2</span>
+              <div><b>注水前整平粉床</b>，輕晃濾杯使乾粉表面水平均勻</div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span style="background: var(--accent-caramel); color: #FFF; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800;">3</span>
+              <div>新手推薦使用<b>平底蛋糕濾杯</b>，多孔垂直落水容錯率更高</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 10: JC 咖啡四大萃取關鍵要素 (校正名詞為二號砂糖)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 04 · 萃取關鍵要素 (JC咖啡來源)</div>
+        <h2 class="slide-title">手沖關鍵要素：<span class="highlight">影響萃取率的四大維度</span></h2>
+        <p class="slide-subtitle">搭配 1:15 黃金粉水比框架，精確掌控杯中風味</p>
+      </div>
+      <div class="grid-2" style="gap: 1.2rem;">
+        <div class="card" style="padding: 1.3rem 1.6rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <h3>🌡️ 水溫高低 (Temperature)</h3>
+            <span class="highlight-pill pill-sweet">熱動能</span>
+          </div>
+          <p style="margin-bottom: 0.6rem;">溫度越高溶解速率越快，香氣與水溶性成分釋放越迅速。</p>
+          <ul class="bullet-list">
+            <li><span class="bullet-tag">水溫偏高</span> 萃取速度加快，香氣與苦甜釋出快，需注意過萃焦澀</li>
+            <li><span class="bullet-tag">水溫偏低</span> 萃取率降低，雜苦減少，容易突顯明亮純淨果酸</li>
+            <li><span class="bullet-tag-gold">基準水溫</span> 約 85°C ~ 95°C（新手標準常用基準約 <b>89°C</b>）</li>
+          </ul>
+        </div>
+        <div class="card" style="padding: 1.3rem 1.6rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <h3>⚙️ 研磨粗細度 (Grind Size)</h3>
+            <span class="highlight-pill pill-acid">接觸表面積</span>
+          </div>
+          <p style="margin-bottom: 0.6rem;">決定熱水與咖啡粉顆粒接觸的總表面積與水流阻力大小。</p>
+          <ul class="bullet-list">
+            <li><span class="bullet-tag">研磨偏細</span> 接觸表面積大、水阻提高、萃取率顯著上升</li>
+            <li><span class="bullet-tag">研磨偏粗</span> 接觸表面積小、排水流速快、萃取率易偏低</li>
+            <li><span class="bullet-tag-gold">建議粗細</span> 約 <b>二號砂糖</b> 顆粒大小（小富士 / 小飛馬 #4）</li>
+          </ul>
+        </div>
+        <div class="card" style="padding: 1.3rem 1.6rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <h3>⏱️ 萃取時間 (Brew Time)</h3>
+            <span class="highlight-pill pill-body">溶出時間軸</span>
+          </div>
+          <p style="margin-bottom: 0.6rem;">水與咖啡粉接觸的總時長，直接決定風味物質溶出的階段。</p>
+          <ul class="bullet-list">
+            <li><span class="bullet-tag">時間過短</span> 水流未充分接觸浸潤，風味容易尖酸且水感單薄</li>
+            <li><span class="bullet-tag">時間過長</span> 後段難溶苦澀多酚釋出，容易產生雜苦澀感</li>
+            <li><span class="bullet-tag-gold">主流標準</span> 建議總沖煮時長約 <b>2 分 ～ 2 分 30 秒</b></li>
+          </ul>
+        </div>
+        <div class="card" style="padding: 1.3rem 1.6rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <h3>☕ 烘焙程度 (Roast Level)</h3>
+            <span class="highlight-pill pill-sweet">結構與溶解度</span>
+          </div>
+          <p style="margin-bottom: 0.6rem;">不同焙度的豆質結構不同，直接影響可溶物溶出的難易度。</p>
+          <ul class="bullet-list">
+            <li><span class="bullet-tag">淺焙豆質</span> 組織緊密堅硬，需充足熱能洗出原生花果酸香</li>
+            <li><span class="bullet-tag">深焙豆質</span> 多孔酥脆觸水即溶，需注意控溫避免過萃焦苦</li>
+            <li><span class="bullet-tag-gold">粉水框架</span> 建議以 <b>1:15</b> 黃金粉水比作為標準沖煮起點</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 11: 悶蒸科學
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 04 · 微觀物理</div>
+        <h2 class="slide-title">悶蒸的關鍵：<span class="highlight">排氣與充分浸潤</span></h2>
+        <p class="slide-subtitle">熱水注入乾粉的第一個 30 秒，決定了整杯萃取的成敗地基</p>
+      </div>
+      <div class="grid-hero">
+        <div>
+          <div class="card" style="margin-bottom: 1.2rem;">
+            <h3>1. 二氧化碳 (CO2) 的排氣效應</h3>
+            <p>新鮮烘焙熟豆內部封存大量二氧化碳氣體。若不先排氣，氣泡會在顆粒表面阻礙熱水浸透，乾粉無法被均勻洗刷，導致水流直接由縫隙滑落。</p>
+          </div>
+          <div class="card">
+            <h3>2. 建立均勻萃取通道</h3>
+            <p>注入少量熱水（約咖啡粉重的 2 倍），使每一粒咖啡粉吸水均勻受潮膨脹。咖啡粉層孔隙敞開，為後續正式注水提供均勻通透的萃取路徑。</p>
+          </div>
+        </div>
+        <div class="card" style="text-align: center; justify-content: center; background: var(--bg-subtle); border-color: var(--accent-caramel);">
+          <div style="font-size: 0.95rem; font-weight: 800; color: var(--accent-caramel); text-transform: uppercase;">
+            悶蒸標準指引 (JC咖啡 / 硬性格)
+          </div>
+          <div style="font-size: 3.5rem; font-weight: 900; color: var(--accent-espresso); margin: 0.8rem 0;">
+            20 ~ 30 秒
+          </div>
+          <p style="font-size: 1.02rem; color: var(--text-main); line-height: 1.6;">
+            • 水量：粉重的 <b>2 倍左右</b> 濕潤乾粉<br>
+            • 動作：由內而外螺旋畫圈注水<br>
+            • 狀態：觀察粉層吸水膨脹排氣，氣泡趨緩時銜接正式注水
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 12: 手沖實戰 SOP (主流 2分~2分30秒標準)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 04 · 實戰沖煮流程</div>
+        <h2 class="slide-title">新手黃金參數：<span class="highlight">分段注水萃取節奏</span></h2>
+        <p class="slide-subtitle">標準示範：20g 咖啡粉 · 1:15 粉水比 · 總水量 300g · 水溫約 89°C~90°C</p>
+      </div>
+      <div class="grid-4">
+        <div class="card">
+          <span class="highlight-pill pill-sweet">0:00 - 0:30</span>
+          <h3 style="margin-top: 0.5rem;">階段一：悶蒸排氣</h3>
+          <p>注入約 <b>40g</b> 熱水</p>
+          <ul class="bullet-list">
+            <li>由內向外螺旋輕柔注水</li>
+            <li>打濕所有乾燥咖啡粉</li>
+            <li>靜置排氣膨脹 20~30 秒</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="highlight-pill pill-acid">0:30 - 1:15</span>
+          <h3 style="margin-top: 0.5rem;">階段二：前段果酸甜</h3>
+          <p>平穩注水至約 <b>160g</b></p>
+          <ul class="bullet-list">
+            <li>維持穩定中心螺旋水流</li>
+            <li>水柱貼近粉層避免翻騰</li>
+            <li>帶出前段明亮果酸與甜感</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="highlight-pill pill-body">1:15 - 1:45</span>
+          <h3 style="margin-top: 0.5rem;">階段三：後段醇厚度</h3>
+          <p>注水至 <b>300g</b> 滿額</p>
+          <ul class="bullet-list">
+            <li>水位下降時銜接注水</li>
+            <li>縮小畫圈範圍維持水溫</li>
+            <li>補充咖啡香氣與圓潤度</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color: var(--accent-caramel);">
+          <span class="highlight-pill" style="background: var(--accent-caramel); color: #FFF;">2:00 - 2:30</span>
+          <h3 style="margin-top: 0.5rem;">階段四：滴漏完畢</h3>
+          <p>總時間約 <b>2分30秒</b></p>
+          <ul class="bullet-list">
+            <li>觀察濾滴流速</li>
+            <li>若尾段變慢且浮沫沉積</li>
+            <li><b>及時移開濾杯</b> 避免雜苦</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 13: 濾杯幾何與水力學 (統一定調錐形快、平底均勻穩定)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 05 · 幾何水力學 (Fuki / Femobook 來源)</div>
+        <h2 class="slide-title">濾杯流速設計：<span class="highlight">錐形 vs 平底蛋糕杯</span></h2>
+        <p class="slide-subtitle">濾杯形狀與底部開孔設計，決定了水流速度與萃取容錯率</p>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between;">
+            <h3>錐形濾杯 (如 V60)</h3>
+            <span class="highlight-pill pill-acid">流速快 · 考驗控水</span>
+          </div>
+          <p style="margin: 0.4rem 0;">圓錐形角度 ＋ 底部單一大孔 ＋ 導流肋骨</p>
+          <ul class="bullet-list">
+            <li><b>水流特性</b>：流速較快，排水空間大，控水自由度高</li>
+            <li><b>風味表現</b>：香氣揚、明亮果酸、風味乾淨立體</li>
+            <li><b>操作特點</b>：風味極度依賴注水穩定度與研磨粗細</li>
+            <li><b>適合豆款</b>：淺焙花果香、水洗處理法</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between;">
+            <h3>平底波浪杯 / 蛋糕杯</h3>
+            <span class="highlight-pill pill-sweet">流速穩定 · 容錯率高</span>
+          </div>
+          <p style="margin: 0.4rem 0;">平坦底面 ＋ 多孔出水 ＋ 波浪折痕濾紙</p>
+          <ul class="bullet-list">
+            <li><b>水流特性</b>：粉床分布均勻，多孔排水路徑均勻平穩</li>
+            <li><b>風味表現</b>：甜感飽滿、圓潤溫和、酸甜平衡</li>
+            <li><b>操作特點</b>：新手維持萃取一致性首選，不易失誤</li>
+            <li><b>適合豆款</b>：日曬豆、蜜處理、新手日常手沖</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between;">
+            <h3>梯形濾杯 (如 101/102)</h3>
+            <span class="highlight-pill pill-body">自帶浸泡 · 醇厚濃郁</span>
+          </div>
+          <p style="margin: 0.4rem 0;">梯形狹長底 ＋ 底部 1~3 小孔阻流</p>
+          <ul class="bullet-list">
+            <li><b>水流特性</b>：下水速度受底孔限制，具半浸泡效果</li>
+            <li><b>風味表現</b>：堅果可可調、古典型濃郁厚實感</li>
+            <li><b>操作特點</b>：流速固定，水流衝擊影響較小</li>
+            <li><b>適合豆款</b>：中深焙豆款、偏好厚實口感者</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 14: 材質與過濾介質 (依據 Femobook 來源校正)
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">MODULE 05 · 材質與介質 (Femobook 來源)</div>
+        <h2 class="slide-title">濾杯材質特性 ＆ <span class="highlight">三大過濾介質</span></h2>
+        <p class="slide-subtitle">材質影響保溫穩定度，過濾介質決定杯中的乾淨度與醇厚感</p>
+      </div>
+      <div class="grid-2">
+        <!-- 材質特性 -->
+        <div class="card">
+          <h3 style="color: var(--accent-espresso); margin-bottom: 0.8rem;">濾杯材質特性比較</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+            <div style="background: var(--bg-subtle); padding: 0.8rem; border-radius: var(--radius-sm);">
+              <b style="color: var(--accent-sage);">🏆 塑膠 / 樹脂（新手友善）</b>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 2px;">熱容量低、不吸熱、輕巧耐摔，水溫不會被杯壁大量吸收，新手最易上手。</p>
+            </div>
+            <div style="background: var(--bg-subtle); padding: 0.8rem; border-radius: var(--radius-sm);">
+              <b style="color: var(--accent-caramel);">陶瓷材質</b>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 2px;">具備優良的保溫蓄熱性，但沖煮前需充分溫杯，以發揮穩定的保溫表現。</p>
+            </div>
+            <div style="background: var(--bg-subtle); padding: 0.8rem; border-radius: var(--radius-sm);">
+              <b style="color: var(--accent-roast);">金屬材質 (不鏽鋼/銅)</b>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 2px;">導熱極快且堅固耐用，但邊緣熱量與空氣散熱速度較快。</p>
+            </div>
+          </div>
+        </div>
+        <!-- 過濾介質 -->
+        <div class="card">
+          <h3 style="color: var(--accent-espresso); margin-bottom: 0.8rem;">過濾介質口感對照</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+            <div style="background: var(--bg-subtle); padding: 0.8rem; border-radius: var(--radius-sm);">
+              <b style="color: var(--accent-espresso);">濾紙 (Paper Filter)</b>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 2px;">有效截留細粉與咖啡油脂，口感最為清澈乾淨，層次分明。</p>
+            </div>
+            <div style="background: var(--bg-subtle); padding: 0.8rem; border-radius: var(--radius-sm);">
+              <b style="color: var(--accent-caramel);">濾布 / 法蘭絨 (Cloth)</b>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 2px;">兼具濾紙的乾淨與保留微量油脂，展現滑順溫潤的甘醇口感。</p>
+            </div>
+            <div style="background: var(--bg-subtle); padding: 0.8rem; border-radius: var(--radius-sm);">
+              <b style="color: var(--accent-amber);">金屬濾網 (Metal Mesh)</b>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 2px;">保留較多天然咖啡油脂與微細粉，口感濃郁厚實 (Body 豐富)。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 15: 風味診斷三秒決策樹
+         ========================================== -->
+    <section class="slide">
+      <div class="slide-header">
+        <div class="slide-badge">實戰手冊 · TROUBLESHOOTING</div>
+        <h2 class="slide-title">風味診斷：<span class="highlight">舌頭是最好的感測器</span></h2>
+        <p class="slide-subtitle">沖出失敗的咖啡不可怕，照著三秒決策樹一秒校正！</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="tree-box">
+          <div class="tree-tag pill-acid">尖銳刺酸、甜感不足</div>
+          <div style="flex: 1;">
+            <b style="color: var(--accent-espresso);">診斷：萃取不足 (Under-Extraction)</b>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">水接觸時間或接觸面積不足，中後段甜感未充分溶出</p>
+          </div>
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 800; color: var(--accent-espresso);">
+            處方：研磨調細 ＋ 適度提高水溫
+          </div>
+        </div>
+        <div class="tree-box">
+          <div class="tree-tag" style="background: rgba(108,117,125,0.12); color: #495057; border: 1px solid rgba(108,117,125,0.25);">焦苦突顯、乾澀刮舌</div>
+          <div style="flex: 1;">
+            <b style="color: var(--accent-espresso);">診斷：過度萃取 (Over-Extraction)</b>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">水流接觸時間過長或水溫過高，溶出過多難溶苦澀物質</p>
+          </div>
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 800; color: var(--accent-espresso);">
+            處方：研磨調粗 ＋ 適度調降水溫
+          </div>
+        </div>
+        <div class="tree-box">
+          <div class="tree-tag pill-sweet">入口尖酸、入喉焦苦</div>
+          <div style="flex: 1;">
+            <b style="color: var(--accent-espresso);">診斷：通道效應 (Channeling)</b>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">水柱砸破裂隙，局部過萃與大面積欠萃同時發生</p>
+          </div>
+          <div style="background: rgba(201, 78, 56, 0.08); border: 1px solid rgba(201, 78, 56, 0.25); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 800; color: var(--accent-terracotta);">
+            處方：放低壺嘴輕柔注水 ＋ 換平底蛋糕杯
+          </div>
+        </div>
+        <div class="tree-box">
+          <div class="tree-tag pill-body">味道都有、但淡薄無力</div>
+          <div style="flex: 1;">
+            <b style="color: var(--accent-espresso);">診斷：濃度過低 (Low TDS)</b>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">萃取率正常，但注水總量過大，咖啡液被過度稀釋</p>
+          </div>
+          <div style="background: rgba(68, 119, 94, 0.08); border: 1px solid rgba(68, 119, 94, 0.25); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 800; color: var(--accent-sage);">
+            處方：縮小粉水比（例如改為標準 1:15）
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SLIDE 16: 結語與 Q&A (純 CSS 與 SVG 裝飾，永不破圖)
+         ========================================== -->
+    <section class="slide" style="background: radial-gradient(circle at 50% 50%, rgba(198, 125, 62, 0.1) 0%, transparent 60%), var(--bg-main);">
+      <div style="max-width: 820px; margin: auto; text-align: center;">
+        <div style="width: 64px; height: 64px; margin: 0 auto 1.2rem auto; color: var(--accent-caramel);">
+          <svg viewBox="0 0 24 24" style="width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+            <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+        </div>
+        <h2 style="font-size: 3.2rem; font-weight: 900; color: var(--text-title); margin-bottom: 1.2rem; letter-spacing: -0.5px;">
+          一杯好咖啡，是<span class="highlight">受控的浪漫</span>
+        </h2>
+        <p style="font-size: 1.25rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 2.5rem;">
+          「生豆處理賦予靈魂基底、烘焙引導香氣音符、<br>
+          濾杯架設好水道舞台，最後由你的沖煮水流奏響完美交響樂！」
+        </p>
+        <div class="card" style="display: inline-block; padding: 1.4rem 2.8rem; border-color: var(--border-strong); background: rgba(255, 255, 255, 0.95); box-shadow: var(--shadow-hover);">
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent-espresso); margin-bottom: 0.3rem;">
+            Q & A · 自由交流與感官體驗
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            手沖咖啡風味科學知識庫 · 歡迎在杯中探索無限可能
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <footer id="bottom-bar">
+    <div class="deck-info">
+      手沖咖啡風味科學 · <span class="counter" id="slide-num">1</span> / <span id="total-slides">16</span>
+    </div>
+    <div class="controls">
+      <button class="btn-nav" onclick="prevSlide()" title="上一頁 (←)">
+        ◀ 上一頁
+      </button>
+      <button class="btn-nav" onclick="nextSlide()" title="下一頁 (Space / →)">
+        下一頁 ▶
+      </button>
+      <button class="btn-nav" onclick="toggleOverview()" title="章節總覽 (O)">
+        目錄 ⊞
+      </button>
+      <button class="btn-nav" onclick="toggleFullscreen()" title="全螢幕 (F)">
+        全螢幕 ⛶
+      </button>
+    </div>
+  </footer>
+
+  <!-- Thumbnail Overview Modal -->
+  <div id="overview-modal" onclick="closeOverview(event)">
+    <div style="max-width: 1250px; margin: auto; display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 1.8rem; font-weight: 800; color: var(--accent-espresso);">投影片全覽 (點擊跳轉)</h2>
+      <button class="btn-nav" onclick="toggleOverview()">✕ 關閉</button>
+    </div>
+    <div class="overview-grid" id="thumb-container"></div>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progress-bar');
+    const slideNumEl = document.getElementById('slide-num');
+    const totalSlidesEl = document.getElementById('total-slides');
+    const overviewModal = document.getElementById('overview-modal');
+    const thumbContainer = document.getElementById('thumb-container');
+
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    totalSlidesEl.textContent = totalSlides;
+
+    // Generate Overview Thumbnails
+    slides.forEach((slide, idx) => {
+      const titleEl = slide.querySelector('.slide-title') || slide.querySelector('h1') || slide.querySelector('h2');
+      const titleText = titleEl ? titleEl.textContent.trim().replace(/\s+/g, ' ') : `Slide ${idx + 1}`;
+      
+      const thumb = document.createElement('div');
+      thumb.className = `thumb-card ${idx === 0 ? 'active' : ''}`;
+      thumb.innerHTML = `
+        <div class="thumb-num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+        <div class="thumb-title">${titleText}</div>
+      `;
+      thumb.onclick = () => {
+        goToSlide(idx);
+        toggleOverview();
+      };
+      thumbContainer.appendChild(thumb);
+    });
+
+    function updateDeck() {
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle('active', idx === currentSlide);
+      });
+      const progress = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = `${progress}%`;
+      slideNumEl.textContent = currentSlide + 1;
+
+      // Update overview active highlight
+      const thumbs = thumbContainer.querySelectorAll('.thumb-card');
+      thumbs.forEach((th, idx) => {
+        th.classList.toggle('active', idx === currentSlide);
+      });
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateDeck();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateDeck();
+      }
+    }
+
+    function goToSlide(idx) {
+      if (idx >= 0 && idx < totalSlides) {
+        currentSlide = idx;
+        updateDeck();
+      }
+    }
+
+    function toggleOverview() {
+      overviewModal.classList.toggle('open');
+    }
+
+    function closeOverview(e) {
+      if (e.target === overviewModal) {
+        overviewModal.classList.remove('open');
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (overviewModal.classList.contains('open')) {
+        if (e.key === 'Escape' || e.key === 'o' || e.key === 'O') {
+          toggleOverview();
+        }
+        return;
+      }
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowDown':
+        case 'PageDown':
+        case ' ':
+          e.preventDefault();
+          nextSlide();
+          break;
+        case 'ArrowLeft':
+        case 'ArrowUp':
+        case 'PageUp':
+          e.preventDefault();
+          prevSlide();
+          break;
+        case 'Home':
+          e.preventDefault();
+          goToSlide(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          goToSlide(totalSlides - 1);
+          break;
+        case 'o':
+        case 'O':
+          toggleOverview();
+          break;
+        case 'f':
+        case 'F':
+          toggleFullscreen();
+          break;
+      }
+    });
+
+    // Touch Swipe Support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    window.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, false);
+
+    function handleSwipe() {
+      const diff = touchEndX - touchStartX;
+      if (Math.abs(diff) > 50) {
+        if (diff < 0) nextSlide();
+        else prevSlide();
+      }
+    }
+
+    // Initial setup
+    updateDeck();
+  </script>
+</body>
+</html>
